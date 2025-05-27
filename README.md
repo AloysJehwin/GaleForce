@@ -1,90 +1,64 @@
-## Turbine Monitor Dashboard
+# Turbine Monitor Dashboard - GaleForce
 
-The Turbine Monitor Dashboard is a React Native application that visually displays real-time wind turbine sensor data. It provides key insights into wind speed, direction, RPM, power output, temperature, and vibration. The app also includes animated fault log alerts and a compass card to indicate wind direction.
+This React Native application displays real-time sensor data from wind turbines in a visual dashboard format. It simulates data for wind speed, wind direction, RPM, power output, temperature, vibration, and displays fault logs dynamically.
 
----
+## Features
 
-### Features
+* Real-time sensor simulation for turbine parameters
+* Graphical charts for each sensor value using `react-native-chart-kit`
+* Compass visualization for wind direction
+* Dynamic fault log display that cycles through messages
+* Optimized layout using `FlatList` for performance
 
-* **Real-Time Sensor Data:** Simulated live data for wind speed, direction, RPM, power, temperature, and vibration.
-* **Wind Direction Compass:** Animated compass card that rotates based on the wind direction.
-* **Line Charts:** Smooth line graphs for each metric, visualizing the latest data trends.
-* **Fault Logs:** Rotating fault log messages to simulate turbine alerts and errors.
-* **Mobile-Friendly UI:** Responsive card layout optimized for mobile devices.
+## Technologies Used
 
----
+* React Native
+* Expo
+* React Native Chart Kit
+* Custom Compass Component for wind direction
 
-### Screenshots
+## Installation
 
-> (Include screenshots here if available)
+1. Clone the repository:
 
----
+   ```bash
+   git clone https://github.com/AloysJehwin/GaleForce.git
+   cd GaleForce
+   ```
 
-### Installation
+2. Install dependencies:
 
-1. **Clone the repository**
+   ```bash
+   npm install
+   ```
 
-```bash
-git clone https://github.com/AloysJehwin/GaleForce.git
-cd GaleForce
-```
+3. Run the app:
 
-2. **Install dependencies**
+   ```bash
+   expo start
+   ```
 
-```bash
-npm install
-```
-
-3. **Add Assets**
-
-Make sure to add an upward-pointing arrow image to the `assets` folder:
-
-```
-/assets/arrow.png
-```
-
-4. **Run the app**
-
-```bash
-npx react-native run-android
-# or
-npx react-native run-ios
-```
-
----
-
-### Project Structure
+## Folder Structure
 
 ```
-.
+/GaleForce
 ├── App.js
+├── components/
+│   └── Compass.js
 ├── styles/
 │   └── styles.js
-├── assets/
-│   └── arrow.png
-├── README.md
-└── package.json
+└── assets/
+    └── arrow.png
 ```
 
----
+## Screenshot
 
-### Dependencies
+![Turbine Monitor Screenshot](https://github.com/AloysJehwin/GaleForce/blob/master/Screenshots/Screenshot_20250527_235853_Expo%20Go.jpg)
 
-* `react-native-chart-kit` – For chart visualizations.
-* `react-native-svg` – Required peer dependency for charts.
-* `react-native-reanimated` – For compass rotation animation.
-* `react-native` core libraries.
+## License
 
----
-
-### Customization
-
-* Update `generateBuffedSensorData()` in `App.js` to pull from real sensor APIs if needed.
-* Replace `faultLogs` with actual logs from a backend or monitoring system.
-* Style and extend the cards using `styles/styles.js`.
+This project is licensed under the MIT License.
 
 ---
 
-### License
-
-This project is licensed under the MIT License. You may use, modify, and distribute it as needed.
+For more information or issues, contact [AloysJehwin](https://github.com/AloysJehwin).
