@@ -53,7 +53,7 @@ This React Native application displays real-time sensor data from wind turbines 
 
 ## Screenshot
 
-![Turbine Monitor Screenshot](https://github.com/AloysJehwin/GaleForce/blob/master/Screenshots/Screenshot_20250527_235853_Expo%20Go.jpg)
+<img src="https://github.com/AloysJehwin/GaleForce/blob/master/Screenshots/Screenshot_20250527_235853_Expo%20Go.jpg" width="300" />
 
 ## License
 
