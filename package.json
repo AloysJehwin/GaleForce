@@ -1,6 +1,7 @@
 {
-  "name": "myfirstapp",
-  "license": "0BSD",
+  "name": "GaleForce",
+  "license": "MIT",
+  "description": "A React Native application for Gale Force, featuring camera functionality and navigation.",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
@@ -15,6 +16,7 @@
     "expo": "~53.0.9",
     "expo-camera": "~16.1.6",
     "expo-status-bar": "~2.2.3",
+    "GaleForce": "file:",
     "myfirstapp": "file:",
     "nativewind": "^4.1.23",
     "react": "19.0.0",
