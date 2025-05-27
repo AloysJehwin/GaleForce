@@ -4451,6 +4451,7 @@ ms@2.0.0:
     expo "~53.0.9"
     expo-camera "~16.1.6"
     expo-status-bar "~2.2.3"
+    GaleForce "file:"
     myfirstapp "file:"
     nativewind "^4.1.23"
     react "19.0.0"
