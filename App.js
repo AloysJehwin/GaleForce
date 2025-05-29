@@ -5,94 +5,98 @@ import styles from './styles/styles';
 
 const screenWidth = Dimensions.get('window').width;
 
-const getBuffedValue = (min, max) => (Math.random() * (max - min) + min).toFixed(2);
+// Convert cardinal to degree
+const cardinalToDegrees = (direction) => {
+  const map = {
+    N: 0,
+    NE: 45,
+    E: 90,
+    SE: 135,
+    S: 180,
+    SW: 225,
+    W: 270,
+    NW: 315,
+  };
+  return map[direction.toUpperCase()] || 0;
+};
 
-const generateBuffedSensorData = () => ({
-  windSpeed: parseFloat(getBuffedValue(25, 60)),
-  windDirection: parseFloat(getBuffedValue(0, 360)),
-  rpm: parseFloat(getBuffedValue(1800, 3200)),
-  powerOutput: parseFloat(getBuffedValue(3500, 7000)),
-  temperature: parseFloat(getBuffedValue(60, 120)),
-  vibration: parseFloat(getBuffedValue(2.0, 6.5)),
-});
-
+// Chart colors for each sensor
 const chartColors = {
-  windSpeed: '#00bcd4',
-  windDirection: '#ff9800',
+  wind_speed: '#00bcd4',
+  wind_direction: '#ff9800',
   rpm: '#8bc34a',
-  powerOutput: '#e91e63',
+  power_output: '#e91e63',
   temperature: '#f44336',
   vibration: '#9c27b0',
 };
 
-const faultLogs = [
-  { code: 'E101', message: 'High vibration detected' },
-  { code: 'E203', message: 'Power output unstable' },
-  { code: 'E305', message: 'RPM out of safe range' },
-  { code: 'E408', message: 'Wind direction sensor error' },
-  { code: 'E512', message: 'Overheat warning' },
-];
-
 export default function App() {
-  const [sensorData, setSensorData] = useState(generateBuffedSensorData());
+  const [sensorData, setSensorData] = useState({});
   const [history, setHistory] = useState({
-    windSpeed: [sensorData.windSpeed],
-    rpm: [sensorData.rpm],
-    powerOutput: [sensorData.powerOutput],
-    temperature: [sensorData.temperature],
-    vibration: [sensorData.vibration],
+    wind_speed: [],
+    rpm: [],
+    power_output: [],
+    temperature: [],
+    vibration: [],
   });
 
-  const [faultIndex, setFaultIndex] = useState(0);
-  const [windDirection] = useState(new Animated.Value(sensorData.windDirection));
+  const [windDirectionAnim] = useState(new Animated.Value(0));
+  const [faultMessage, setFaultMessage] = useState('');
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const newSensorData = generateBuffedSensorData();
-      setSensorData(newSensorData);
+  const fetchSensorData = async () => {
+    try {
+      const response = await fetch('https://p0ul64xxyc.execute-api.us-east-1.amazonaws.com/latest');
+      const result = await response.json();
+
+      const { data } = result;
+      const windDirDeg = cardinalToDegrees(data.wind_direction);
+
+      setSensorData(data);
+      setFaultMessage(data.fault_log || 'No faults');
 
       setHistory((prev) => {
         const updated = {};
-        for (let key in prev) {
-          updated[key] = [...prev[key], newSensorData[key]].slice(-10);
+        for (let key of Object.keys(prev)) {
+          updated[key] = [...prev[key], data[key]].slice(-10);
         }
         return updated;
       });
 
-      Animated.timing(windDirection, {
-        toValue: newSensorData.windDirection,
+      Animated.timing(windDirectionAnim, {
+        toValue: windDirDeg,
         duration: 1000,
         useNativeDriver: true,
       }).start();
+    } catch (error) {
+      console.error('Failed to fetch data:', error);
+    }
+  };
 
-    }, 3000);
+  useEffect(() => {
+    fetchSensorData(); // initial
+    const interval = setInterval(fetchSensorData, 3000);
     return () => clearInterval(interval);
   }, []);
 
-  useEffect(() => {
-    const faultInterval = setInterval(() => {
-      setFaultIndex((prevIndex) => (prevIndex + 1) % faultLogs.length);
-    }, 4000);
-    return () => clearInterval(faultInterval);
-  }, []);
-
-  const sensorLabels = ['windSpeed', 'vibration', 'rpm', 'powerOutput', 'temperature', 'windDirection'];
+  const sensorLabels = ['wind_speed', 'vibration', 'rpm', 'power_output', 'temperature', 'wind_direction'];
 
   const formatLabel = (label) =>
-    label.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase());
+    label.replace(/_/g, ' ').replace(/([a-z])([A-Z])/g, '$1 $2').replace(/^./, (str) => str.toUpperCase());
 
-  const compassRotation = windDirection.interpolate({
+  const compassRotation = windDirectionAnim.interpolate({
     inputRange: [0, 360],
     outputRange: ['0deg', '360deg'],
   });
 
   const renderSensorCard = (key) => {
-    if (key === 'windDirection') {
+    if (!sensorData[key] && key !== 'wind_direction') return null;
+
+    if (key === 'wind_direction') {
       return (
         <View key={key} style={styles.card}>
           <View style={styles.cardContent}>
             <Text style={[styles.label, { color: chartColors[key], fontWeight: '700' }]}>
-              {formatLabel(key)} ({sensorData.windDirection.toFixed(0)}°)
+              {formatLabel(key)} ({sensorData.wind_direction || 'N/A'})
             </Text>
             <View style={styles.compassContainer}>
               <Animated.Image
@@ -110,14 +114,10 @@ export default function App() {
       <View key={key} style={styles.card}>
         <View style={styles.cardContent}>
           <View style={[styles.valueContainer, { marginRight: 2 }]}>
-            <Text
-              style={[styles.label, { color: chartColors[key], fontWeight: '700' }]}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
+            <Text style={[styles.label, { color: chartColors[key], fontWeight: '700' }]} numberOfLines={1}>
               {formatLabel(key)}
             </Text>
-            <Text style={styles.value}>{sensorData[key].toFixed(2)}</Text>
+            <Text style={styles.value}>{sensorData[key]?.toFixed(2) ?? 'N/A'}</Text>
           </View>
           <LineChart
             data={{ labels: [], datasets: [{ data: history[key] }] }}
@@ -128,7 +128,6 @@ export default function App() {
               backgroundGradientTo: '#222222',
               color: () => chartColors[key],
               strokeWidth: 2,
-              useShadowColorFromDataset: false,
               fillShadowGradient: 'transparent',
               fillShadowGradientOpacity: 0,
               propsForBackgroundLines: {
@@ -149,8 +148,6 @@ export default function App() {
     );
   };
 
-  const currentFault = faultLogs[faultIndex];
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Turbine Monitor Dashboard</Text>
@@ -165,9 +162,7 @@ export default function App() {
         <Text style={[styles.label, { fontWeight: '700', color: '#ff4444', marginBottom: 4 }]}>
           Fault Logs
         </Text>
-        <Text style={styles.faultText}>
-          {currentFault.code} - {currentFault.message}
-        </Text>
+        <Text style={styles.faultText}>{faultMessage}</Text>
       </View>
     </View>
   );
