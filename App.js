@@ -45,7 +45,7 @@ export default function App() {
 
   const fetchSensorData = async () => {
     try {
-      const response = await fetch('https://p0ul64xxyc.execute-api.us-east-1.amazonaws.com/default/latest');
+      const response = await fetch('https://p0ul64xxyc.execute-api.us-east-1.amazonaws.com/latest');
       const result = await response.json();
 
       const { data } = result;
