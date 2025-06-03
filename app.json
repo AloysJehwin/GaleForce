@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "MyFirstApp",
-    "slug": "MyFirstApp",
+    "name": "GaleForce",
+    "slug": "GaleForce",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
